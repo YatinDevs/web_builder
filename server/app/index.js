@@ -11,9 +11,12 @@ const sequelize = require("./utils/db");
 
 // Models setup
 
-const Employee = require("./models/employeeModel");
+const User = require("./models/userModel");
 const Token = require("./models/tokenModel");
-const models = { Employee, Token };
+const Template = require("./models/templateModel");
+const Website = require("./models/websiteModel");
+const NavSection = require("./models/navSectionModel");
+const models = { User, Token, Template, Website, NavSection };
 
 Object.keys(models).forEach((modelName) => {
   if (models[modelName].associate) {
@@ -36,19 +39,25 @@ const corsOptions = {
   methods: "GET,POST,PUT,DELETE,PATCH,OPTIONS",
   allowedHeaders: "Content-Type,Authorization",
 };
-app.use(cors(corsOptions)); // Handle all routes CORS at once
+app.use(cors(corsOptions));
 app.use(morgan("dev"));
-app.use(express.json()); // body parser
+app.use(express.json());
 app.use(cookieParser());
-app.use(express.urlencoded({ extended: true })); //
+app.use(express.urlencoded({ extended: true }));
 app.get("/dev", (req, res) => {
   res.send("Website Template App");
 });
 
 // Routes
 const authRoutes = require("./routes/authRoutes");
+const templateRoutes = require("./routes/templateRoutes");
+const navSectionRoutes = require("./routes/navSectionRoutes");
+const websiteRoutes = require("./routes/websiteRoutes");
 
 app.use("/api/v1/auth", authRoutes);
+app.use("/api/v1/template", templateRoutes);
+app.use("/api/v1/template/navSection", navSectionRoutes);
+app.use("/api/v1/websites", websiteRoutes);
 
 sequelize
   .authenticate()

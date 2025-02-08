@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken");
 const Token = require("../models/tokenModel");
-const Employee = require("../models/employeeModel");
+const User = require("../models/userModel");
 const bcrypt = require("bcrypt");
 const {
   generateAccessToken,
@@ -11,24 +11,24 @@ exports.signup = async (req, res) => {
   try {
     const { username, email, password } = req.body;
 
-    const existingEmployee = await Employee.findOne({ where: { email } });
-    if (existingEmployee) {
+    const existingUser = await User.findOne({ where: { email } });
+    if (existingUser) {
       return res.status(400).json({ error: "Email already exists" });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    const employee = await Employee.create({
+    const user = await User.create({
       username,
       email,
       password: hashedPassword,
-      role: "employee",
+      role: "user",
     });
 
-    const accessToken = generateAccessToken(employee);
-    const refreshToken = generateRefreshToken(employee);
+    const accessToken = generateAccessToken(user);
+    const refreshToken = generateRefreshToken(user);
 
     await Token.create({
-      employeeId: employee.id,
+      userId: user.id,
       token: refreshToken,
       expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
     });
@@ -46,18 +46,18 @@ exports.signup = async (req, res) => {
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
-    const employee = await Employee.findOne({ where: { email } });
+    const user = await User.findOne({ where: { email } });
 
-    if (!employee || !(await bcrypt.compare(password, employee.password))) {
+    if (!user || !(await bcrypt.compare(password, user.password))) {
       return res.status(401).json({ error: "Invalid credentials" });
     }
 
-    const accessToken = generateAccessToken(employee);
-    const refreshToken = generateRefreshToken(employee);
+    const accessToken = generateAccessToken(user);
+    const refreshToken = generateRefreshToken(user);
 
-    await Token.destroy({ where: { employeeId: employee.id } }); // Invalidate old refresh tokens
+    await Token.destroy({ where: { userId: user.id } }); // Invalidate old refresh tokens
     await Token.create({
-      employeeId: employee.id,
+      userId: user.id,
       token: refreshToken,
       expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
     });
@@ -82,13 +82,13 @@ exports.refreshToken = async (req, res) => {
         .status(401)
         .json({ error: "Invalid or expired refresh token" });
 
-    const employee = await Employee.findByPk(tokenData.employeeId);
-    const newAccessToken = generateAccessToken(employee);
-    const newRefreshToken = generateRefreshToken(employee);
+    const user = await User.findByPk(tokenData.userId);
+    const newAccessToken = generateAccessToken(user);
+    const newRefreshToken = generateRefreshToken(user);
 
     await Token.destroy({ where: { token: refreshToken } }); // Rotate refresh token
     await Token.create({
-      employeeId: employee.id,
+      userId: user.id,
       token: newRefreshToken,
       expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
     });
@@ -118,18 +118,19 @@ exports.logout = async (req, res) => {
 };
 exports.getEmp = async (req, res) => {
   try {
+    console.log(req);
     const { accessToken } = req.cookies;
     if (!accessToken)
       return res.status(401).json({ error: "No token provided" });
 
     const decoded = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET);
-    const employee = await Employee.findByPk(decoded.id, {
+    const user = await User.findByPk(decoded.id, {
       attributes: ["id", "username", "email", "role"],
     });
 
-    if (!employee) return res.status(404).json({ error: "User not found" });
+    if (!user) return res.status(404).json({ error: "User not found" });
 
-    res.json({ employee });
+    res.json({ user });
   } catch (error) {
     res.status(401).json({ error: "Unauthorized" });
   }

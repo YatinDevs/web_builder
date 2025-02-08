@@ -2,15 +2,22 @@ import CustomizeTemplate from "@/components/CustomizeTemplate/CustomizeTemplate"
 import TemplateSelector from "@/components/TemplateSelector/TemplateSelector";
 import useAuthStore from "@/store/authStore";
 import { useNavigate } from "react-router-dom";
+import FetchNavSection from "./NavSection/FetchNavData";
+import { useState } from "react";
+import useWebsiteStore from "@/store/useWebsiteStore";
 
 const Dashboard = () => {
   const { user, logout } = useAuthStore();
+  const { websiteId, subdomain, templateId } = useWebsiteStore();
   const navigate = useNavigate();
 
   const handleLogout = async () => {
     await logout();
     navigate("/login");
   };
+  const [selectedTemplate, setSelectedTemplate] = useState(templateId);
+  const [website_id, setWebsiteId] = useState(websiteId);
+  const [subdomain_r, setSubdomain] = useState(subdomain);
 
   return (
     <div>
@@ -23,8 +30,17 @@ const Dashboard = () => {
           Logout
         </button>
       </div>
-      <TemplateSelector />
-      <CustomizeTemplate />
+      <div>
+        <TemplateSelector setSelectedTemplate={setSelectedTemplate} />
+      </div>
+      <div className="mb-100">
+        <FetchNavSection
+          selectedTemplate={selectedTemplate}
+          subdomain_r={subdomain_r}
+          website_id={website_id}
+        />
+      </div>
+      {/* <CustomizeTemplate /> */}
     </div>
   );
 };

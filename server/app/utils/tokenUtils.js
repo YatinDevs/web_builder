@@ -1,16 +1,16 @@
 const jwt = require("jsonwebtoken");
 
-const generateAccessToken = (employee) => {
+const generateAccessToken = (user) => {
   return jwt.sign(
-    { id: employee.id, role: employee.role },
+    { id: user.id, role: user.role },
     process.env.ACCESS_TOKEN_SECRET,
     { expiresIn: "15m" }
   );
 };
 
-const generateRefreshToken = (employee) => {
+const generateRefreshToken = (user) => {
   return jwt.sign(
-    { id: employee.id, role: employee.role },
+    { id: user.id, role: user.role },
     process.env.REFRESH_TOKEN_SECRET,
     {
       expiresIn: "7d",

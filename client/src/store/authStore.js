@@ -30,7 +30,7 @@ const useAuthStore = create((set) => ({
   checkAuth: async () => {
     try {
       const res = await axiosInstance.get("/auth/me");
-      set({ user: res.data.employee, isAuthenticated: true });
+      set({ user: res.data.user, isAuthenticated: true });
     } catch (error) {
       set({ user: null, isAuthenticated: false });
     }
