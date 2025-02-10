@@ -55,3 +55,8 @@
 body {
   @apply font-sans antialiased bg-background text-foreground;
 }
+
+/* Custom scrollbar hiding */
+::-webkit-scrollbar {
+  display: none;
+}

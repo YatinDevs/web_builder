@@ -100,6 +100,40 @@ exports.getNavSectionById = async (req, res) => {
   }
 };
 
+exports.getLatestNavSectionByWebsiteId = async (req, res) => {
+  try {
+    console.log(req.params);
+    let websiteId = req.params.id;
+    const navSection = await NavSection.findOne({
+      where: { website_id: websiteId },
+      order: [["createdAt", "DESC"]],
+    });
+    if (!navSection) {
+      return res.status(404).json({ error: "NavSection not found" });
+    }
+    res
+      .status(200)
+      .json({ message: "NavSection retrieved successfully", data: navSection });
+  } catch (error) {
+    console.error("Error fetching NavSection:", error);
+    throw error;
+  }
+};
+// Get a single navigation section by ID
+exports.getNavSectionById = async (req, res) => {
+  try {
+    const navSection = await NavSection.findByPk(req.params.id);
+    if (!navSection) {
+      return res.status(404).json({ error: "NavSection not found" });
+    }
+
+    res
+      .status(200)
+      .json({ message: "NavSection retrieved successfully", data: navSection });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
 // Update a navigation section
 exports.updateNavSection = async (req, res) => {
   try {

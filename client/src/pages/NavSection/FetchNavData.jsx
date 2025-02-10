@@ -7,11 +7,17 @@ import Template2 from "@/templates/Template2";
 
 const { Step } = Steps;
 
-const FetchNavSection = ({ selectedTemplate, subdomain_r, website_id }) => {
+const FetchNavSection = ({
+  selectedTemplate,
+  subdomain_r,
+  website_id,
+  website,
+}) => {
   const { websiteId, subdomain, fetchWebsiteDetails } = useWebsiteStore();
   const [navbarData, setNavbarData] = useState(null); // Store navbar data for live preview
   const [templateIss, setTemplateIss] = useState("");
-  const { createNavSection, fetchNavSection } = useNavStore();
+  const [webId, setWebId] = useState(null);
+  const { createNavSection, fetchNavSectionwithWebId } = useNavStore();
   const [step, setStep] = useState(0);
   const [form] = Form.useForm();
   const [formData, setFormData] = useState({
@@ -27,11 +33,10 @@ const FetchNavSection = ({ selectedTemplate, subdomain_r, website_id }) => {
   });
   console.log(formData);
 
-  // Fetch existing navbar data for preview when component mounts
   useEffect(() => {
     const fetchNavbarData = async () => {
-      if (websiteId) {
-        const data = await fetchNavSection(websiteId);
+      if (website_id) {
+        const data = await fetchNavSectionwithWebId(website_id);
         setNavbarData(data);
       }
     };
@@ -57,7 +62,10 @@ const FetchNavSection = ({ selectedTemplate, subdomain_r, website_id }) => {
       console.log("Final Form Data:", finalData);
       const res = await createNavSection(finalData);
       console.log(res.navSection);
-      const updatedData = await fetchNavSection(res.navSection.website_id);
+      setWebId(res.navSection.website_id);
+      const updatedData = await fetchNavSectionwithWebId(
+        res.navSection.website_id
+      );
       const selectedTemplate = await fetchWebsiteDetails(
         res.navSection.website_id
       );

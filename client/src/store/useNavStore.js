@@ -18,6 +18,19 @@ const useNavStore = create((set) => ({
     }
   },
 
+  fetchNavSectionwithWebId: async (websiteId) => {
+    try {
+      const response = await axiosInstance.get(
+        `/template/navSection/web-id/${websiteId}`
+      );
+      console.log(response);
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching navigation section:", error);
+      return null;
+    }
+  },
+
   createNavSection: async (newNavSection) => {
     try {
       const response = await axiosInstance.post(

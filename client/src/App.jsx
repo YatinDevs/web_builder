@@ -12,6 +12,7 @@ import useAuthStore from "./store/authStore";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Signup from "./pages/Signup";
+import CustomizeTemplate from "./components/CustomizeTemplate/CustomizeTemplate";
 
 function App() {
   const { checkAuth, user, isAuthenticated } = useAuthStore();
@@ -41,14 +42,13 @@ function App() {
             </AuthRedirect>
           }
         />
-
         {/* Protected Routes */}
         <Route element={<ProtectedRoute />}>
           <Route path="/dashboard" element={<Dashboard />} />
         </Route>
-
-        {/* Catch-all Route */}
-        <Route path="*" element={<Navigate to="/dashboard" replace />} />
+        <Route element={<ProtectedRoute />}>
+          <Route path="/customize" element={<CustomizeTemplate />} />{" "}
+        </Route>
       </Routes>
     </Router>
   );

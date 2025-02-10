@@ -23,9 +23,11 @@ const createWebsite = async (req, res) => {
       status: "pending",
     });
 
-    res
-      .status(201)
-      .json({ message: "Website created successfully", website: newWebsite });
+    res.status(201).json({
+      success: true,
+      message: "Website created successfully",
+      website: newWebsite,
+    });
   } catch (error) {
     console.error("Error creating website:", error);
     res.status(500).json({ error: "Internal server error" });
